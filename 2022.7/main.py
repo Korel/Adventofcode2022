@@ -1,3 +1,19 @@
+class Directory:
+    pass
+
+class Directory:
+    parent: Directory
+    children: list[Directory] # of Dirs
+    files: list[int]
+    name: str
+    size: int
+
+    def __init__(self, name, parent=None, size=0):
+        self.children = []
+        self.files = []
+        self.name = name
+        self.parent = parent
+
 input_file = """$ ls
 dir a
 14848514 b.txt
@@ -26,25 +42,6 @@ input_file = input_file.split('\n')
 input_file = open("input.txt", "r")
 input_file = list(map(lambda s: s.strip('\n') ,input_file.readlines()))
 
-
-class Dir:
-    pass
-
-class Dir:
-    parent: Dir
-    children: list[Dir] # of Dirs
-    files: list[int]
-    name: str
-    size: int
-
-    def __init__(self, name, parent=None, size=0):
-        self.children = []
-        self.files = []
-        self.name = name
-        self.parent = parent
-        self.size = size
-
-
 MEMO = {}
 
 def getDirSize(dir):
@@ -62,7 +59,7 @@ def getDirSize(dir):
         
 
 
-curr_dir = Dir(name="/", parent=None)
+curr_dir = Directory(name="/", parent=None)
 for line in input_file:
     if line == "$ ls":
         continue
@@ -77,7 +74,7 @@ for line in input_file:
     dir = line.find("dir")
     if dir != -1:
         target = line[dir+4:]
-        curr_dir.children.append(Dir(name=target, parent=curr_dir))
+        curr_dir.children.append(Directory(name=target, parent=curr_dir))
         continue
     if line[0].isnumeric():
         size = int(line[0:line.find(" ")])
@@ -98,7 +95,3 @@ for val in MEMO.values():
         found_min = min(found_min, val)
 
 print(found_min)
-
-
-
-# print(sum(list(filter(lambda size: size <= 100000, MEMO.values()))))
