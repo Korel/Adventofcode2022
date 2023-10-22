@@ -47,7 +47,7 @@ fn second_task(contents: &[&str], map: &HashMap<char, u64>) {
 }
 
 fn main() {
-    let input = fs::read_to_string("./input.txt").unwrap();
+    let input = fs::read_to_string("../input.txt").unwrap();
     let contents = input.split('\n').collect::<Vec<&str>>();
 
     let map = HashMap::from([
