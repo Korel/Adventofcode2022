@@ -1,4 +1,5 @@
 import math
+import copy
 
 class Monkey:
     items: list[int]
@@ -13,6 +14,9 @@ class Monkey:
         self.test = 0
         self.throw = [-1, -1]
         self.inspection = 0
+
+    def __repr__(self) -> str:
+        return f"Monkey {{ items: {self.items}, operation: {self.operation}, test: {self.test}, throw: {self.throw}, inspection: {self.inspection}}}"
 
 
 def parse_input(lines: list[str]) -> list[Monkey]:
@@ -84,6 +88,7 @@ def first_task(monkeys: list[Monkey]) -> int:
     inspections.sort()
     return inspections[-1] * inspections[-2]
 
+
 def second_task(monkeys: list[Monkey]) -> int:
     tests = []
     for monkey in monkeys:
@@ -103,12 +108,11 @@ def second_task(monkeys: list[Monkey]) -> int:
                 else:
                     worry = item * operation_value
 
-                test = worry % monkey.test
-                if test == 0:
+                if worry % monkey.test == 0:
                     monkeys[monkey.throw[0]].items.append(worry)
                 else:
                     monkeys[monkey.throw[1]].items.append(worry % test_lcm)
-
+    
     inspections = [monkey.inspection for monkey in monkeys]
     inspections.sort()
     return inspections[-1] * inspections[-2]
@@ -118,9 +122,13 @@ def main():
     file = open("input.txt", "r")
     lines = file.readlines()
     monkeys = parse_input(lines)
-    print(f"first_task: {first_task(monkeys)}")
-    print(f"second_task: {second_task(monkeys)}")
-
+    first_task_result = first_task(copy.deepcopy(monkeys))
+    second_task_result = second_task(monkeys)
+    print(f"first_task: {first_task_result}")
+    print(f"second_task: {second_task_result}")
+    # The asserts are added after the solution to ensure refactoring does not brake it.
+    assert(first_task_result == 110220)
+    assert(second_task_result == 19457438264)
 
 if __name__ == "__main__":
     main()
