@@ -1,4 +1,5 @@
 import math
+import sys
 
 def parse_input(filename) -> list[list[str], list[int], list[int]]:
     grid = []
@@ -67,20 +68,83 @@ class Solver:
         return self.memo[row][col]
     
     def solve(self):
-        return self.move(self.start)
+        self.solution = [[math.inf for _ in range(len(self.grid[0]))]
+                     for _ in range(len(self.grid))]
+        self.solution[self.end[0]][self.end[1]] = 0
+        self.traverse(self.end)
+        return self.solution[self.start[0]][self.start[1]]
+    
+    def traverse(self, curr_pos):
+        if curr_pos == self.start:
+            return
+        [row, col] = curr_pos
+        curr = self.grid[row][col]
+        if row - 1 >= 0:
+            if curr - self.grid[row - 1][col] <= 1:
+                if self.solution[row - 1][col] > self.solution[row][col] + 1:
+                    self.solution[row - 1][col] = self.solution[row][col] + 1
+                    self.traverse([row - 1, col])
+                
+        if row + 1 < len(self.grid):
+            if curr - self.grid[row + 1][col] <= 1:
+                if self.solution[row + 1][col] > self.solution[row][col] + 1:
+                    self.solution[row + 1][col] = self.solution[row][col] + 1
+                    self.traverse([row + 1, col])
+        if col - 1 >= 0:
+            if curr - self.grid[row][col - 1] <= 1:
+                if self.solution[row][col - 1] > self.solution[row][col] + 1:
+                    self.solution[row][col - 1] = self.solution[row][col] + 1
+                    self.traverse([row, col - 1])
+        if col + 1 < len(self.grid[0]):
+            if curr - self.grid[row][col + 1] <= 1:
+                if self.solution[row][col + 1] > self.solution[row][col] + 1:
+                    self.solution[row][col + 1] = self.solution[row][col] + 1
+                    self.traverse([row, col + 1])
 
-def main():
+def first_task():
+    sys.setrecursionlimit(1300)
     test_input = parse_input("test.txt")
     test_solver = Solver(test_input[0], test_input[1], test_input[2])
-    print(f"test input: {test_solver.solve()}")
-    assert(test_solver.solve() == 31)
+    test_solution = test_solver.solve()
+    print(f"test input: {test_solution}")
+    assert(test_solution == 31)
     
     [grid, start, end] = parse_input("input.txt")
-    print(f"grid len: {len(grid), len(grid[0])}")
     solver = Solver(grid, start, end)
-    print(f"real input: {solver.solve()}") # 415 too high, 108 is too low
-    # print(solver.memo)
+    solution = solver.solve()
+    print(f"real input: {solution}")
+    assert(solution == 370)
 
+def second_task():
+    sys.setrecursionlimit(1300)
+    [test_grid, test_start, test_end]= parse_input("test.txt")
+    test_solver = Solver(test_grid, test_start, test_end)
+    test_solution = math.inf
+    for i in range(len(test_grid)):
+        for j in range(len(test_grid[0])):
+            if test_grid[i][j] == 0:
+                test_start = [i,j]
+                test_solver.start = test_start
+                test_solution = min(test_solution, test_solver.solve())
+    print(f"test input: {test_solution}")
+    assert(test_solution == 29)
+    
+    
+    [grid, _, end] = parse_input("input.txt")
+    solution = math.inf
+    import copy
+    for i in range(len(grid)):
+        for j in range(len(grid[0])):
+            solver = Solver(copy.deepcopy(grid), [i,j], end)
+            if grid[i][j] == 0:
+                temp_solution = solver.solve()
+                solution = min(solution, temp_solution)
+    print(f"real input: {solution}")
+    assert(solution == 363)
+
+def main():
+    first_task()
+    second_task()
 
 
 if __name__ == "__main__":
